@@ -1,0 +1,24 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /zjlong
+spring:
+  application:
+    name: study-jdbc
+#  datasource:
+#    url: jdbc:mysql://127.0.0.1:3306/usercenter?characterEncoding=utf-8
+#    username: root
+#    password: 123456
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    time-zone: GMT+8
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: transaction
+
+mybatis:
+#  config-location: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.zjlong.studyjdbc.business.entity

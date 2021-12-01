@@ -1,0 +1,83 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /zjlong
+spring:
+  application:
+    name: study-jdbc
+#  datasource:
+#    url: jdbc:mysql://127.0.0.1:3306/usercenter?characterEncoding=utf-8
+#    username: root
+#    password: 123456
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    time-zone: GMT+8
+  main:
+    allow-bean-definition-overriding: true
+  shardingsphere:
+    props:
+      sql:
+        show: true
+    datasource:
+      names: ds1,ds2
+      ds1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3307/test?characterEncoding=utf-8&useSSL=false
+        username: root
+        password: 123456
+        maxPoolSize: 100
+        minPoolSize: 5
+
+      ds2:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3308/test?characterEncoding=utf-8&useSSL=false
+        username: root
+        password: 123456
+        maxPoolSize: 100
+        minPoolSize: 5
+    sharding:
+      #配置默认数据源
+      default-data-source-name: ds1
+      #配置数据源的读写分离，但是数据库一定要做主从复制
+      tables:
+        #逻辑表名
+        goods:
+          #数据节点：多数据源$->{0..N}.逻辑表名$->{0..N},相同表
+          actual-data-nodes: ds$->{1}.goods$->{0..1}
+          #数据节点：多数据源$->{0..N}.逻辑表$->{0..N},不同表
+          #actual-data-nodes: ds1.ksd_user$->{0..1},ds2.ksd_user$->{2..4}
+          #指定但数据源的配置方式
+          #actual-data-nodes: ds0.goods$->{0..4}
+          #全部手动指定,不需要分片策略
+          #actual-data-nodes: ds1.goods_0,ds2.goods_0
+          #分库策略
+#          data-strategy:
+#            inline:
+#              sharding-column: goods_type
+#                algorithm-expression: ds$->{goods_type % 2}
+          #分表策略
+          table-strategy:
+            inline:
+              sharding-column: goods_id
+              algorithm-expression: goods$->{goods_id % 2}
+      #数据分片的读写分离配置
+      master-slave-rules:
+        #这里配置读写分离的时候一定要记得添加主库的数据源名称 这里为ds1
+        ds1:
+          master-data-source-name: ds1
+          slave-data-source-names: ds2
+    #非数据分片的读写分离配置
+    masterslave:
+      #配置主从名称，可以任意取名字
+      name: ms
+      #配置slave节点的负载均衡策略，采用轮询机制
+      load-balance-algorithm-type: round_robin
+
+
+mybatis:
+#  config-location: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.zjlong.studyjdbc.business.entity

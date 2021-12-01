@@ -1,0 +1,6 @@
+# Project exclude paths
+/db-read-write/target/
+/db-shard-read-write/target/
+/month-shard-database/target/
+/standard-shard-database/target/
+/study-shard-database/target/
